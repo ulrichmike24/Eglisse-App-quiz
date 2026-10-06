@@ -1,0 +1,6 @@
+{
+  "name": "Béréens - Bible, Discipulat & Communion",
+  "description": "Plateforme biblique complète intégrant les 66 livres, multi-traductions comparées, recherche intelligente par IA, suivi de groupes de disciples, histoires bibliques et espace enfants.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

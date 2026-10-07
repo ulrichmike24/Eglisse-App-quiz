@@ -36,6 +36,7 @@ interface BibleReaderProps {
   bookmarks: UserBookmark[];
   onOpenVerseModal: (verse: BibleVerse) => void;
   onOpenShareModal: (verse: BibleVerse) => void;
+  onOpenStrongLexicon?: (code: string) => void;
 }
 
 export const BibleReader: React.FC<BibleReaderProps> = ({
@@ -51,6 +52,7 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
   bookmarks,
   onOpenVerseModal,
   onOpenShareModal,
+  onOpenStrongLexicon,
 }) => {
   const [isBookDrawerOpen, setIsBookDrawerOpen] = useState(false);
   const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
@@ -743,21 +745,64 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                     )}
 
                     <div className="flex-1">
-                      <span>{v.text}</span>
+                      {showStrongConcordance && v.tokens && v.tokens.length > 0 ? (
+                        <span className="flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
+                          {v.tokens.map((token, tIdx) =>
+                            token.strongCode ? (
+                              <button
+                                key={tIdx}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onOpenStrongLexicon) {
+                                    onOpenStrongLexicon(token.strongCode!);
+                                  }
+                                }}
+                                className="inline-flex items-baseline gap-0.5 px-1 py-0.2 rounded hover:bg-sky-100 hover:text-sky-900 text-sky-800 font-medium transition-colors cursor-pointer border border-transparent hover:border-sky-300 text-left"
+                                title={`Racine Strong ${token.strongCode} — Cliquez pour ouvrir le lexique`}
+                              >
+                                <span>{token.text}</span>
+                                <span className="text-[9px] font-mono text-sky-500 font-bold">
+                                  {token.strongCode}
+                                </span>
+                              </button>
+                            ) : (
+                              <span key={tIdx}>{token.text}</span>
+                            )
+                          )}
+                        </span>
+                      ) : (
+                        <span>{v.text}</span>
+                      )}
+
+                      {/* Cross references pill */}
+                      {showStrongConcordance && v.crossReferences && v.crossReferences.length > 0 && (
+                        <div className="mt-1 text-[11px] text-slate-500 font-sans flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] uppercase font-bold text-slate-400">Références :</span>
+                          {v.crossReferences.map((ref, rIdx) => (
+                            <span
+                              key={rIdx}
+                              className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200"
+                            >
+                              {ref}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Strong Hebrew/Greek Root & Concordance definition */}
-                      {showStrongConcordance && v.strongCode && (
-                        <div className="mt-1 text-[11px] font-mono text-amber-400/90 flex flex-wrap items-center gap-2 not-italic">
-                          <span className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700 font-bold">
+                      {showStrongConcordance && v.strongCode && (!v.tokens || v.tokens.length === 0) && (
+                        <div className="mt-1 text-[11px] font-mono text-sky-700 flex flex-wrap items-center gap-2 not-italic">
+                          <span className="bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 font-bold">
                             {v.strongCode}
                           </span>
                           {v.strongOriginal && (
-                            <span className="italic font-serif text-slate-300">
+                            <span className="italic font-serif text-slate-600">
                               « {v.strongOriginal} »
                             </span>
                           )}
                           {v.strongDefinition && (
-                            <span className="text-slate-400 text-[10px]">
+                            <span className="text-slate-500 text-[10px]">
                               ({v.strongDefinition})
                             </span>
                           )}

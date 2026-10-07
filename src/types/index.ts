@@ -16,6 +16,11 @@ export interface BibleBook {
   chaptersCount: number;
 }
 
+export interface VerseTokenItem {
+  text: string;
+  strongCode?: string;
+}
+
 export interface BibleVerse {
   bookId: string;
   bookName: string;
@@ -26,6 +31,8 @@ export interface BibleVerse {
   strongCode?: string;
   strongOriginal?: string;
   strongDefinition?: string;
+  tokens?: VerseTokenItem[];
+  crossReferences?: string[];
 }
 
 export interface UserNote {

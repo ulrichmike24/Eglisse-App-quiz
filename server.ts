@@ -4,6 +4,8 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
 import { handleBibleAIChat } from './server/ragBibleService.ts';
+import genesisRaw from './src/data/genesisBook.json';
+import { parseTaggedVerseText } from './src/utils/bibleParser.ts';
 
 dotenv.config();
 
@@ -419,6 +421,31 @@ app.post('/api/bible/chapter', async (req, res) => {
     }
 
     const bookNr = BOOK_ID_TO_NUMBER[bookId?.toUpperCase()] || 1;
+
+    // 0. If Genesis (GEN), serve immediately from authentic local JSON
+    if (bookId?.toUpperCase() === 'GEN' || bookNr === 1) {
+      const rawChapters = (genesisRaw as any).chapters;
+      const foundChapter = rawChapters?.find((c: any) => c.chapter === Number(chapter));
+      if (foundChapter && Array.isArray(foundChapter.verses)) {
+        const result = {
+          bookId: 'GEN',
+          bookName: 'Genèse',
+          chapter: Number(chapter),
+          translation,
+          totalVerses: foundChapter.verses.length,
+          verses: foundChapter.verses.map((v: any) => {
+            const parsed = parseTaggedVerseText(v.text);
+            return {
+              verse: v.verse,
+              text: parsed.cleanText || v.text,
+              strongCode: parsed.primaryStrongCode,
+            };
+          }),
+        };
+        bibleChapterCache.set(cacheKey, result);
+        return res.json(result);
+      }
+    }
 
     // 1. For LSG (Louis Segond 1910), DARBY, and KJV: Fetch authentic canonical text directly
     if (translation === 'LSG' || translation === 'DARBY' || translation === 'KJV') {

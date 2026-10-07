@@ -2,6 +2,8 @@ import { GoogleGenAI } from '@google/genai';
 import { BIBLE_DICTIONARY_TERMS, BibleDictionaryTerm } from '../src/data/bibleDictionary.ts';
 import { BIBLICAL_CHARACTERS, BiblicalCharacter } from '../src/data/bibleCharacters.ts';
 import { BIBLE_STORIES } from '../src/data/bibleStories.ts';
+import genesisRaw from '../src/data/genesisBook.json';
+import { parseTaggedVerseText } from '../src/utils/bibleParser.ts';
 
 export interface BibleChatRequest {
   message: string;
@@ -136,6 +138,23 @@ async function fetchCanonicalChapter(bookNr: number, chapter: number): Promise<{
   const cacheKey = `${bookNr}_${chapter}`;
   if (chapterCache.has(cacheKey)) {
     return chapterCache.get(cacheKey)!.verses;
+  }
+
+  // 1. If Genesis (Book nr 1), load immediately from authentic JSON
+  if (bookNr === 1) {
+    const rawBook = genesisRaw as any;
+    const foundChapter = rawBook.chapters?.find((c: any) => c.chapter === chapter);
+    if (foundChapter && Array.isArray(foundChapter.verses)) {
+      const verses = foundChapter.verses.map((v: any) => {
+        const parsed = parseTaggedVerseText(v.text);
+        return {
+          verse: Number(v.verse),
+          text: parsed.cleanText || v.text,
+        };
+      });
+      chapterCache.set(cacheKey, { verses });
+      return verses;
+    }
   }
 
   try {

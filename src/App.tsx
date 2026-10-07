@@ -315,6 +315,10 @@ export default function App() {
             bookmarks={bookmarks}
             onOpenVerseModal={(v) => setSelectedVerseForModal(v)}
             onOpenShareModal={(v) => setSelectedVerseForShare(v)}
+            onOpenStrongLexicon={(code) => {
+              setActiveStrongCode(code);
+              setIsStrongLexiconOpen(true);
+            }}
           />
         )}
 

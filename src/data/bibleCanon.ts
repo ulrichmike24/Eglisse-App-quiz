@@ -1,4 +1,5 @@
 import { BibleBook, BibleTranslationInfo, BibleVerse, TranslationKey } from '../types';
+import { getGenesisChapterVerses, hasGenesisChapter } from './genesisDataLoader';
 
 export const BIBLE_TRANSLATIONS: BibleTranslationInfo[] = [
   {
@@ -595,6 +596,14 @@ export async function fetchExactBibleChapter(
   chapter: number,
   translation: TranslationKey = 'LSG'
 ): Promise<{ verses: BibleVerse[]; isAIGenerated?: boolean }> {
+  // 0. If Genesis, load immediately from local authentic JSON
+  if (bookId === 'GEN' && hasGenesisChapter(chapter)) {
+    const genVerses = getGenesisChapterVerses(chapter, translation);
+    if (genVerses.length > 0) {
+      return { verses: genVerses, isAIGenerated: false };
+    }
+  }
+
   const cacheKey = `bereens_chapter_${bookId}_${chapter}_${translation}`.toUpperCase();
 
   // 1. Check local device cache
@@ -692,6 +701,11 @@ export async function fetchExactBibleChapter(
 }
 
 export function getChapterVerses(bookId: string, chapter: number, translation: TranslationKey = 'LSG'): BibleVerse[] {
+  // 0. If Genesis, load immediately from local authentic JSON
+  if (bookId === 'GEN' && hasGenesisChapter(chapter)) {
+    return getGenesisChapterVerses(chapter, translation);
+  }
+
   const book = BIBLE_BOOKS.find((b) => b.id === bookId) || BIBLE_BOOKS[0];
 
   // Check localStorage cache first

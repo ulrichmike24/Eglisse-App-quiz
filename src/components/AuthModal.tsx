@@ -239,23 +239,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-600">
-              <User className="h-5 w-5" />
+        <div className="flex items-center justify-between border-b border-slate-200 px-3.5 sm:px-6 py-3 sm:py-4 bg-slate-50 gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0">
+              <User className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <h3 className="font-cinzel text-base font-bold text-slate-900">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-cinzel text-sm sm:text-base font-bold text-slate-900 truncate">
                 {authMode === 'login'
                   ? 'Connexion Disciple'
                   : authMode === 'register'
                   ? 'Créer un Compte Disciple'
                   : 'Mon Profil & Sécurité'}
               </h3>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
                 {authMode === 'login'
                   ? 'Accédez à vos notes, favoris et suivi de groupe synchronisés'
                   : authMode === 'register'
@@ -265,14 +265,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             {!isGuest && authMode === 'profile' && (
               <button
                 onClick={() => {
                   onLogout();
                   setAuthMode('login');
                 }}
-                className="flex items-center gap-1 px-2.5 py-1 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2 py-1 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-lg transition-colors cursor-pointer"
                 title="Se déconnecter"
               >
                 <LogOut className="h-3.5 w-3.5" />
@@ -289,7 +289,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Mode Switcher Banner (if guest or wanting to switch) */}
-        <div className="flex border-b border-slate-200 bg-white px-6 text-xs font-semibold">
+        <div className="flex border-b border-slate-200 bg-white px-3 sm:px-6 text-xs font-semibold overflow-x-auto no-scrollbar">
           {isGuest ? (
             <>
               <button

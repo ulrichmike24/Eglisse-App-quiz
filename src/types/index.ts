@@ -185,7 +185,7 @@ export interface ReaderSettings {
 export interface StrongLexiconEntry {
   code: string;
   originalWord: string;
-  language: 'Hébreu' | 'Grec';
+  language: 'Hébreu' | 'Grec' | 'Araméen';
   transliteration: string;
   pronunciation: string;
   partOfSpeech: string;
@@ -193,6 +193,9 @@ export interface StrongLexiconEntry {
   theologicalContext: string;
   occurrencesCount: number;
   sampleVerses: string[];
+  tanakhSection?: string;
+  category?: string;
+  rootOrigin?: string;
 }
 
 export interface ReadingPlanDay {
@@ -204,5 +207,43 @@ export interface ReadingPlanDay {
   completedAt: boolean;
   completedNt: boolean;
   completedPsaume: boolean;
+}
+
+export type ChallengeCategory = 'meditation' | 'memorization' | 'theology' | 'intercession' | 'discipleship';
+
+export interface DailyReadingChallenge {
+  id: string;
+  dateStr: string; // YYYY-MM-DD
+  dayOfYear: number;
+  title: string;
+  category: ChallengeCategory;
+  bookId: string;
+  bookName: string;
+  chapter: number;
+  versesRange: string;
+  keyVerse: string;
+  theme: string;
+  contextNote: string;
+  readingFocus: string;
+  practicalAction: string;
+  pointsReward: number; // e.g. 50, 75, 100 points
+  bonusGroupPoints: number; // e.g. 25 points to group progression
+  quizQuestion?: {
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  };
+  completedByUsers?: string[]; // IDs of users who completed it
+}
+
+export interface UserChallengeCompletion {
+  challengeId: string;
+  userId: string;
+  completedAt: string;
+  notes?: string;
+  reflection?: string;
+  pointsEarned: number;
+  bonusGroupPointsEarned: number;
 }
 

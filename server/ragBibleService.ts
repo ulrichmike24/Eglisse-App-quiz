@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { BIBLE_DICTIONARY_TERMS, BibleDictionaryTerm } from '../src/data/bibleDictionary.ts';
 import { BIBLICAL_CHARACTERS, BiblicalCharacter } from '../src/data/bibleCharacters.ts';
 import { BIBLE_STORIES } from '../src/data/bibleStories.ts';
+import { STRONG_LEXICON } from '../src/data/strongLexicon.ts';
 import genesisRaw from '../src/data/genesisBook.json';
 import { parseTaggedVerseText } from '../src/utils/bibleParser.ts';
 
@@ -249,6 +250,24 @@ export async function retrieveRAGContext(query: string) {
     }
   }
 
+  // 2b. Check for Strong Concordance & Hebrew / Aramaic / Greek roots (RAG Step 2b)
+  let matchingStrongEntry: any = null;
+  const strongEntries = Object.values(STRONG_LEXICON);
+  for (const entry of strongEntries) {
+    const codeMatch = queryLower.includes(entry.code.toLowerCase());
+    const translitMatch = entry.transliteration && queryLower.includes(entry.transliteration.toLowerCase());
+    const origMatch = entry.originalWord && query.includes(entry.originalWord);
+    if (codeMatch || translitMatch || origMatch) {
+      matchingStrongEntry = entry;
+      ragSources.push({
+        type: 'dictionary',
+        title: `Concordance Strong ${entry.code} : ${entry.originalWord} (${entry.transliteration})`,
+        detail: `${entry.language} · ${entry.partOfSpeech}. Définition : ${entry.definition}. Fréquence : ${entry.occurrencesCount} fois.`,
+      });
+      break;
+    }
+  }
+
   // 3. Check for biblical characters (RAG Step 3)
   for (const char of BIBLICAL_CHARACTERS) {
     const charName = char.name.toLowerCase();
@@ -288,6 +307,7 @@ export async function retrieveRAGContext(query: string) {
     detectedReference,
     retrievedVerses,
     matchingDictionaryTerm,
+    matchingStrongEntry,
     matchingCharacter,
     matchingStory,
     ragSources,
@@ -416,6 +436,20 @@ export async function handleBibleAIChat(
     groundingText += `Versets clés : ${t.keyVerses.join(', ')}\n`;
     groundingText += `Explication simple : ${t.simpleExplanation}\n`;
     groundingText += `Application : ${t.practicalApplication}\n`;
+  }
+
+  if (ragContext.matchingStrongEntry) {
+    const s = ragContext.matchingStrongEntry;
+    groundingText += `\n--- CONCORDANCE STRONG & RACINE ORIGINALE DU TEXTE BIBLIQUE VÉRIFIÉE ---\n`;
+    groundingText += `Code Strong : ${s.code}\n`;
+    groundingText += `Mot original : ${s.originalWord} (${s.transliteration})\n`;
+    groundingText += `Langue : ${s.language} · Grammaire : ${s.partOfSpeech}\n`;
+    if (s.tanakhSection) groundingText += `Canon biblique : ${s.tanakhSection}\n`;
+    if (s.rootOrigin) groundingText += `Racine / Étymologie : ${s.rootOrigin}\n`;
+    groundingText += `Définition Strong : ${s.definition}\n`;
+    groundingText += `Portée théologique : ${s.theologicalContext}\n`;
+    groundingText += `Nombre d'occurrences : ${s.occurrencesCount} fois dans les Écritures\n`;
+    groundingText += `Passages exemples : ${s.sampleVerses.join(', ')}\n`;
   }
 
   if (ragContext.matchingCharacter) {

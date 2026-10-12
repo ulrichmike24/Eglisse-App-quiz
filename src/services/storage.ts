@@ -9,6 +9,7 @@ import {
   UserHighlight,
   UserNote,
   UserProfile,
+  UserChallengeCompletion,
 } from '../types';
 import { BIBLE_READING_PLAN_DAYS } from '../data/readingPlan';
 import { INITIAL_KIDS_STORIES } from '../data/kidsContent';
@@ -27,6 +28,7 @@ const STORAGE_KEYS = {
   LAST_SYNC: 'bereens_last_sync_timestamp',
   PARENTAL_PIN: 'bereens_parental_pin',
   READING_PLAN: 'bereens_reading_plan_state',
+  CHALLENGE_COMPLETIONS: 'bereens_challenge_completions',
 };
 
 export const GUEST_USER_PROFILE: UserProfile = {
@@ -613,6 +615,39 @@ export const StorageService = {
 
   eraseAccountData(): void {
     Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
+  },
+
+  // -------------------------------------------------------------
+  // DAILY BIBLE READING CHALLENGES & DISCIPLES GROUP POINTS
+  // -------------------------------------------------------------
+  getChallengeCompletions(): UserChallengeCompletion[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CHALLENGE_COMPLETIONS);
+      if (data) return JSON.parse(data);
+    } catch {}
+    return [];
+  },
+
+  saveChallengeCompletions(completions: UserChallengeCompletion[]): void {
+    localStorage.setItem(STORAGE_KEYS.CHALLENGE_COMPLETIONS, JSON.stringify(completions));
+  },
+
+  isChallengeCompleted(challengeId: string, userId: string): boolean {
+    const completions = this.getChallengeCompletions();
+    return completions.some((c) => c.challengeId === challengeId && c.userId === userId);
+  },
+
+  recordChallengeCompletion(completion: UserChallengeCompletion): void {
+    const list = this.getChallengeCompletions();
+    const existingIndex = list.findIndex(
+      (c) => c.challengeId === completion.challengeId && c.userId === completion.userId
+    );
+    if (existingIndex >= 0) {
+      list[existingIndex] = completion;
+    } else {
+      list.push(completion);
+    }
+    this.saveChallengeCompletions(list);
   },
 };
 

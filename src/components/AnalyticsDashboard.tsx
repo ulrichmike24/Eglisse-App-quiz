@@ -59,23 +59,23 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 py-8 px-4 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white text-slate-800 py-4 sm:py-8 px-2.5 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="pb-6 border-b border-sky-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs uppercase tracking-widest text-sky-600 font-semibold font-cinzel">
               Indicateurs & Suivi Spirituel
             </span>
-            <h1 className="font-cinzel text-3xl font-bold text-slate-900 mt-1">
-              Tableau de Bord Analytique d’Engagement
+            <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
+              Tableau de Bord Analytique
             </h1>
             <p className="text-xs text-slate-500 mt-1">
               Mesurez votre assiduité dans la Parole de Dieu et l'impact au sein de votre famille de disciples.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 no-print">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 no-print">
             <div className="flex items-center bg-slate-100 border border-slate-200 p-1 rounded-xl text-xs">
               {(['week', 'month', 'year'] as const).map((tf) => (
                 <button

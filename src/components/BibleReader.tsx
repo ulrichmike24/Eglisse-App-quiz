@@ -18,10 +18,13 @@ import {
   ShieldCheck,
   Check,
   RefreshCw,
+  Headphones,
 } from 'lucide-react';
 import { BibleBook, BibleVerse, ReaderSettings, TranslationKey, UserBookmark, UserHighlight, UserNote } from '../types';
 import { BIBLE_BOOKS, BIBLE_TRANSLATIONS, getChapterVerses, fetchExactBibleChapter } from '../data/bibleCanon';
 import { AudioReaderService } from '../services/storage';
+import { getChapterTheologicalGuide } from '../data/chapterAudioGuides';
+import { ChapterAudioGuidePlayer } from './ChapterAudioGuidePlayer';
 
 interface BibleReaderProps {
   currentBookId: string;
@@ -58,6 +61,7 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
   const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isAudioGuideOpen, setIsAudioGuideOpen] = useState(false);
   const [bookSearch, setBookSearch] = useState('');
   const [testamentFilter, setTestamentFilter] = useState<'ALL' | 'AT' | 'NT'>('ALL');
   const [showStrongConcordance, setShowStrongConcordance] = useState(false);
@@ -199,6 +203,10 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
     return matchesTestament && matchesSearch;
   });
 
+  // Theme flags for high contrast readability
+  const isDark = readerSettings.theme === 'dark' || readerSettings.theme === 'oled';
+  const isSepia = readerSettings.theme === 'sepia';
+
   // Theme styling mapping
   const getThemeClasses = () => {
     switch (readerSettings.theme) {
@@ -255,35 +263,36 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
   return (
     <div className={`min-h-[calc(100vh-4rem)] flex flex-col transition-colors duration-300 ${getThemeClasses()}`}>
       {/* Reader Control Toolbar */}
-      <div className={`sticky top-16 z-30 border-b backdrop-blur-md px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 ${getContainerSurfaceClasses()}`}>
+      <div className={`sticky top-14 sm:top-16 z-30 border-b backdrop-blur-md px-2.5 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 ${getContainerSurfaceClasses()}`}>
         {/* Book & Chapter Pickers */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => setIsBookDrawerOpen(!isBookDrawerOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-300 text-xs font-bold font-cinzel transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-300 text-xs font-bold font-cinzel transition-all shadow-xs cursor-pointer max-w-[130px] sm:max-w-none truncate"
           >
-            <Book className="h-4 w-4 text-sky-500" />
-            <span>{currentBook.name}</span>
+            <Book className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-sky-500 shrink-0" />
+            <span className="truncate">{currentBook.name}</span>
           </button>
 
           <button
             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 font-mono transition-colors shadow-xs cursor-pointer"
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 font-mono transition-colors shadow-xs cursor-pointer shrink-0"
           >
-            Ch. {currentChapter} / {currentBook.chaptersCount}
+            <span className="sm:hidden">Ch. {currentChapter}</span>
+            <span className="hidden sm:inline">Ch. {currentChapter} / {currentBook.chaptersCount}</span>
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <button
               onClick={handlePrevChapter}
-              className="p-1.5 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+              className="p-1 sm:p-1.5 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
               title="Chapitre précédent"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={handleNextChapter}
-              className="p-1.5 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+              className="p-1 sm:p-1.5 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
               title="Chapitre suivant"
             >
               <ChevronRight className="h-4 w-4" />
@@ -292,14 +301,14 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
         </div>
 
         {/* Translation & Comparison Controls */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
-            <Languages className="h-3.5 w-3.5 text-sky-500 ml-1.5 mr-0.5" />
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          <div className="flex items-center gap-1 bg-white p-0.5 sm:p-1 rounded-xl border border-slate-200 shadow-xs max-w-[125px] sm:max-w-none">
+            <Languages className="h-3.5 w-3.5 text-sky-500 ml-1 mr-0.5 shrink-0" />
             <select
               value={currentTranslation}
               onChange={(e) => onSelectTranslation(e.target.value as TranslationKey)}
               aria-label="Sélectionner la traduction biblique"
-              className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-none py-1 pr-2 cursor-pointer"
+              className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-none py-1 pr-1 truncate cursor-pointer max-w-[95px] sm:max-w-none"
             >
               {BIBLE_TRANSLATIONS.map((t) => (
                 <option key={t.key} value={t.key} className="bg-white text-slate-900">
@@ -316,7 +325,7 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                 parallelMode: !readerSettings.parallelMode,
               })
             }
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer shrink-0 ${
               readerSettings.parallelMode
                 ? 'bg-sky-50 text-sky-700 border-sky-300 shadow-xs'
                 : 'text-slate-600 border-slate-200 hover:text-sky-700 hover:bg-sky-50'
@@ -325,6 +334,7 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
           >
             <Columns className="h-3.5 w-3.5 text-sky-500" />
             <span className="hidden sm:inline">Traductions Parallèles</span>
+            <span className="sm:hidden text-[11px]">Parallèle</span>
           </button>
 
           {readerSettings.parallelMode && (
@@ -336,7 +346,7 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                 })
               }
               aria-label="Sélectionner la traduction parallèle de comparaison"
-              className="bg-white text-xs font-semibold text-sky-700 border border-sky-200 rounded-xl px-2 py-1 focus:outline-none shadow-xs"
+              className="bg-white text-xs font-semibold text-sky-700 border border-sky-200 rounded-xl px-1.5 sm:px-2 py-1 focus:outline-none shadow-xs max-w-[95px] sm:max-w-none truncate"
             >
               {BIBLE_TRANSLATIONS.map((t) => (
                 <option key={t.key} value={t.key} className="bg-white text-slate-900">
@@ -346,10 +356,24 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
             </select>
           )}
 
+          {/* Audio-Guide Théologique button */}
+          <button
+            onClick={() => setIsAudioGuideOpen(!isAudioGuideOpen)}
+            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 ${
+              isAudioGuideOpen
+                ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-300/40 shadow-amber-500/20'
+                : 'bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200'
+            }`}
+            title="Ouvrir l'audio-guide théologique de ce chapitre"
+          >
+            <Headphones className="h-3.5 w-3.5" />
+            <span className="hidden xs:inline">Audio-Guide</span>
+          </button>
+
           {/* Audio read chapter */}
           <button
             onClick={handleToggleChapterAudio}
-            className={`p-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`p-1.5 sm:p-2 rounded-xl text-xs font-medium transition-colors cursor-pointer shrink-0 ${
               isPlayingAudio ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50'
             }`}
             title={isPlayingAudio ? 'Arrêter la lecture audio' : 'Écouter le chapitre'}
@@ -635,40 +659,77 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
       {/* Main Chapter Reading Canvas */}
       <main className="flex-1 mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Chapter Title & Header */}
-        <div className="text-center mb-8 border-b border-slate-800/80 pb-6">
-          <span className="text-xs uppercase tracking-widest text-orange-400 font-semibold font-cinzel">
+        <div className={`text-center mb-8 pb-6 border-b ${isDark ? 'border-slate-800' : isSepia ? 'border-stone-300' : 'border-sky-100'}`}>
+          <span className={`text-xs uppercase tracking-widest font-bold font-cinzel ${
+            isDark ? 'text-amber-400' : isSepia ? 'text-amber-900' : 'text-sky-700'
+          }`}>
             {currentBook.testament === 'AT' ? 'Ancien Testament' : 'Nouveau Testament'} · {currentBook.category}
           </span>
-          <h1 className="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-2 text-slate-100">
+          <h1 className={`font-cinzel text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mt-2 ${
+            isDark ? 'text-white' : isSepia ? 'text-stone-900' : 'text-slate-900'
+          }`}>
             {currentBook.name}
           </h1>
-          <p className="font-cormorant text-xl text-slate-400 italic mt-1">
+          <p className={`font-cormorant text-xl font-medium italic mt-1 ${
+            isDark ? 'text-slate-300' : isSepia ? 'text-stone-700' : 'text-slate-600'
+          }`}>
             Chapitre {currentChapter}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5 bg-orange-950/40 text-orange-300 px-3 py-1 rounded-full border border-orange-500/30 font-medium">
-              <ShieldCheck className="h-3.5 w-3.5 text-orange-400" />
+          <div className={`flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 text-xs ${
+            isDark ? 'text-slate-300' : isSepia ? 'text-stone-700' : 'text-slate-700'
+          }`}>
+            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border font-semibold ${
+              isDark
+                ? 'bg-orange-950/40 text-orange-300 border-orange-500/30'
+                : isSepia
+                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                : 'bg-sky-50 text-sky-800 border-sky-200'
+            }`}>
+              <ShieldCheck className={`h-3.5 w-3.5 ${isDark ? 'text-orange-400' : 'text-sky-600'}`} />
               <span>Conforme à emcitv.com/bible/ ({currentTranslation})</span>
             </span>
-            <span>·</span>
-            <span>{displayedVerses.length} versets</span>
-            <span>·</span>
+            <span className="opacity-40">·</span>
+            <span className="font-semibold">{displayedVerses.length} versets</span>
+            <span className="opacity-40">·</span>
             <button
               onClick={() => setShowStrongConcordance(!showStrongConcordance)}
-              className={`px-2.5 py-0.5 rounded-full border text-[11px] transition-colors ${
+              className={`px-3 py-1 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
                 showStrongConcordance
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-400 font-semibold'
-                  : 'text-slate-400 border-slate-700 hover:text-slate-200'
+                  ? isDark
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-400'
+                    : 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                  : isDark
+                    ? 'text-slate-300 border-slate-700 hover:text-white hover:bg-slate-800'
+                    : 'text-slate-700 border-slate-300 hover:text-slate-900 hover:bg-slate-100'
               }`}
               title="Afficher les mots originaux hébreux et grecs et codes Strong comme sur EMCI TV"
             >
               Concordance Strong : {showStrongConcordance ? 'Active' : 'Désactivée'}
             </button>
+            <span className="opacity-40">·</span>
+            <button
+              onClick={() => setIsAudioGuideOpen(!isAudioGuideOpen)}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold transition-all cursor-pointer ${
+                isAudioGuideOpen
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/30'
+                  : isDark
+                    ? 'bg-sky-500/20 text-sky-300 border-sky-400/40 hover:bg-sky-500/30'
+                    : 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100'
+              }`}
+              title="Lancer l'audio-guide théologique pour ce chapitre"
+            >
+              <Headphones className="h-3.5 w-3.5 text-sky-600" />
+              <span>Audio-Guide Théologique</span>
+            </button>
           </div>
 
           {isLoadingExactBible && (
-            <div className="mt-3 py-1.5 px-4 rounded-xl bg-orange-500/10 border border-orange-500/30 text-xs text-orange-300 flex items-center justify-center gap-2 animate-pulse">
+            <div className={`mt-3 py-2 px-4 rounded-xl border text-xs flex items-center justify-center gap-2 animate-pulse font-medium ${
+              isDark
+                ? 'bg-orange-500/10 border-orange-500/30 text-orange-300'
+                : 'bg-amber-50 border-amber-200 text-amber-900'
+            }`}>
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
               <span>Chargement du texte exact Louis Segond 1910...</span>
             </div>
@@ -683,15 +744,19 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
             style={{ fontSize: `${readerSettings.fontSize}px` }}
           >
             {displayedVerses.length === 0 && (
-              <div className="py-16 text-center space-y-4 rounded-2xl bg-[#0E2442]/60 border border-slate-800 p-8">
-                <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center animate-pulse">
+              <div className={`py-16 text-center space-y-4 rounded-2xl border p-8 ${
+                isDark
+                  ? 'bg-[#0E2442]/60 border-slate-800 text-slate-100'
+                  : 'bg-slate-50 border-slate-200 text-slate-800'
+              }`}>
+                <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center animate-pulse">
                   <Book className="h-6 w-6" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-cinzel text-lg font-bold text-slate-100">
+                  <h3 className={`font-cinzel text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                     Chargement de {currentBook.name} {currentChapter}
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     Récupération du texte authentique Louis Segond 1910 ({currentTranslation})...
                   </p>
                 </div>
@@ -731,22 +796,34 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                 }
               }
 
+              const verseHoverClass = isDark
+                ? 'hover:bg-slate-800/50'
+                : isSepia
+                ? 'hover:bg-stone-200/50'
+                : 'hover:bg-sky-50/70';
+
+              const verseNumberColor = isDark
+                ? 'text-amber-400 font-bold'
+                : isSepia
+                ? 'text-amber-900 font-extrabold'
+                : 'text-sky-700 font-extrabold';
+
               return (
                 <div
                   key={v.verse}
                   onClick={() => onOpenVerseModal(v)}
-                  className={`group relative p-2.5 -mx-2.5 rounded-xl cursor-pointer hover:bg-slate-800/40 transition-all ${hlClass}`}
+                  className={`group relative p-2.5 -mx-2.5 rounded-xl cursor-pointer transition-all ${verseHoverClass} ${hlClass}`}
                 >
                   <div className="flex items-baseline gap-3">
                     {readerSettings.showVerseNumbers && (
-                      <span className="font-mono text-xs font-bold text-orange-400/90 select-none shrink-0 w-6 text-right">
+                      <span className={`font-mono text-xs select-none shrink-0 w-6 text-right ${verseNumberColor}`}>
                         {v.verse}
                       </span>
                     )}
 
                     <div className="flex-1">
                       {showStrongConcordance && v.tokens && v.tokens.length > 0 ? (
-                        <span className="flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
+                        <span className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                           {v.tokens.map((token, tIdx) =>
                             token.strongCode ? (
                               <button
@@ -758,11 +835,19 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                                     onOpenStrongLexicon(token.strongCode!);
                                   }
                                 }}
-                                className="inline-flex items-baseline gap-0.5 px-1 py-0.2 rounded hover:bg-sky-100 hover:text-sky-900 text-sky-800 font-medium transition-colors cursor-pointer border border-transparent hover:border-sky-300 text-left"
+                                className={`inline-flex items-baseline gap-0.5 px-1.5 py-0.5 rounded transition-colors cursor-pointer border text-left ${
+                                  isDark
+                                    ? 'hover:bg-sky-950 text-sky-300 border-sky-800/60 bg-sky-950/30'
+                                    : isSepia
+                                    ? 'hover:bg-amber-100 text-stone-900 border-stone-300 bg-stone-100'
+                                    : 'hover:bg-sky-100 text-sky-900 border-sky-200 bg-sky-50/60 font-medium'
+                                }`}
                                 title={`Racine Strong ${token.strongCode} — Cliquez pour ouvrir le lexique`}
                               >
                                 <span>{token.text}</span>
-                                <span className="text-[9px] font-mono text-sky-500 font-bold">
+                                <span className={`text-[10px] font-mono font-bold ${
+                                  isDark ? 'text-sky-400' : 'text-sky-700'
+                                }`}>
                                   {token.strongCode}
                                 </span>
                               </button>
@@ -777,12 +862,18 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
 
                       {/* Cross references pill */}
                       {showStrongConcordance && v.crossReferences && v.crossReferences.length > 0 && (
-                        <div className="mt-1 text-[11px] text-slate-500 font-sans flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] uppercase font-bold text-slate-400">Références :</span>
+                        <div className={`mt-1.5 text-xs font-sans flex items-center gap-1.5 flex-wrap ${
+                          isDark ? 'text-slate-300' : 'text-slate-700'
+                        }`}>
+                          <span className="text-[10px] uppercase font-bold opacity-75">Références :</span>
                           {v.crossReferences.map((ref, rIdx) => (
                             <span
                               key={rIdx}
-                              className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200"
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono border font-medium ${
+                                isDark
+                                  ? 'bg-slate-800 text-slate-200 border-slate-700'
+                                  : 'bg-slate-100 text-slate-800 border-slate-300'
+                              }`}
                             >
                               {ref}
                             </span>
@@ -792,17 +883,23 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
 
                       {/* Strong Hebrew/Greek Root & Concordance definition */}
                       {showStrongConcordance && v.strongCode && (!v.tokens || v.tokens.length === 0) && (
-                        <div className="mt-1 text-[11px] font-mono text-sky-700 flex flex-wrap items-center gap-2 not-italic">
-                          <span className="bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 font-bold">
+                        <div className={`mt-1.5 text-xs font-mono flex flex-wrap items-center gap-2 not-italic ${
+                          isDark ? 'text-sky-300' : 'text-sky-900'
+                        }`}>
+                          <span className={`px-1.5 py-0.5 rounded border font-bold text-[11px] ${
+                            isDark
+                              ? 'bg-sky-950/80 text-sky-300 border-sky-800'
+                              : 'bg-sky-100 text-sky-800 border-sky-300'
+                          }`}>
                             {v.strongCode}
                           </span>
                           {v.strongOriginal && (
-                            <span className="italic font-serif text-slate-600">
+                            <span className="italic font-serif font-semibold">
                               « {v.strongOriginal} »
                             </span>
                           )}
                           {v.strongDefinition && (
-                            <span className="text-slate-500 text-[10px]">
+                            <span className="text-[11px] opacity-80">
                               ({v.strongDefinition})
                             </span>
                           )}
@@ -811,10 +908,14 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
 
                       {/* Attached user note preview pill if present */}
                       {userNt && (
-                        <div className="mt-2 text-xs font-sans not-italic bg-slate-900/90 border border-slate-700 p-2.5 rounded-lg text-slate-300 flex items-start gap-2 shadow-sm">
-                          <MessageSquare className="h-3.5 w-3.5 text-orange-400 shrink-0 mt-0.5" />
+                        <div className={`mt-2 text-xs font-sans not-italic p-2.5 rounded-xl border flex items-start gap-2 shadow-xs ${
+                          isDark
+                            ? 'bg-slate-900/95 border-slate-700 text-slate-200'
+                            : 'bg-amber-50/90 border-amber-300 text-slate-800'
+                        }`}>
+                          <MessageSquare className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                           <div className="flex-1">
-                            <span className="font-semibold text-amber-300 block mb-0.5">Ma Réflexion :</span>
+                            <span className="font-bold text-amber-700 dark:text-amber-300 block mb-0.5">Ma Réflexion :</span>
                             <p className="line-clamp-2">{userNt.text}</p>
                           </div>
                         </div>
@@ -823,8 +924,8 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
 
                     {/* Quick interactive indicators */}
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 self-center">
-                      {isBm && <Bookmark className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />}
-                      <span className="text-[10px] text-slate-400 font-sans uppercase tracking-wider">
+                      {isBm && <Bookmark className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />}
+                      <span className="text-[10px] font-sans font-semibold uppercase tracking-wider opacity-70">
                         Annoter
                       </span>
                     </div>
@@ -836,9 +937,11 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
         ) : (
           /* Parallel Multi-Translation Mode */
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 pb-2 border-b border-slate-800 text-xs font-bold font-cinzel text-amber-300">
-              <div>{currentTranslation} (Principale)</div>
-              <div>{readerSettings.parallelTranslation} (Comparée)</div>
+            <div className={`hidden md:grid md:grid-cols-2 gap-4 pb-2 border-b text-xs font-bold font-cinzel ${
+              isDark ? 'border-slate-800 text-amber-300' : isSepia ? 'border-stone-300 text-amber-900' : 'border-sky-100 text-sky-800'
+            }`}>
+              <div>{currentTranslation} (Version Principale)</div>
+              <div>{readerSettings.parallelTranslation} (Version Comparée)</div>
             </div>
 
             <div
@@ -846,15 +949,19 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
               style={{ fontSize: `${readerSettings.fontSize}px` }}
             >
               {displayedVerses.length === 0 && (
-                <div className="py-16 text-center space-y-4 rounded-2xl bg-[#0E2442]/60 border border-slate-800 p-8">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center animate-pulse">
+                <div className={`py-16 text-center space-y-4 rounded-2xl border p-8 ${
+                  isDark
+                    ? 'bg-[#0E2442]/60 border-slate-800 text-slate-100'
+                    : 'bg-slate-50 border-slate-200 text-slate-800'
+                }`}>
+                  <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center animate-pulse">
                     <Book className="h-6 w-6" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-cinzel text-lg font-bold text-slate-100">
+                    <h3 className={`font-cinzel text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                       Chargement des versions comparées...
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                       Récupération de {currentBook.name} {currentChapter} ({currentTranslation} & {readerSettings.parallelTranslation})...
                     </p>
                   </div>
@@ -867,20 +974,54 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
                   <div
                     key={pv.verse}
                     onClick={() => onOpenVerseModal(pv)}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-xl border border-slate-800/60 hover:border-orange-500/50 hover:bg-slate-850/50 cursor-pointer transition-all"
+                    className={`grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                      isDark
+                        ? 'border-slate-800/80 bg-slate-900/40 hover:border-orange-500/50 hover:bg-slate-850 text-slate-100'
+                        : isSepia
+                        ? 'border-stone-300 bg-[#FBF8F1] hover:border-amber-400 hover:bg-stone-100 text-stone-900'
+                        : 'border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/40 text-slate-900 shadow-2xs'
+                    }`}
                   >
                     <div>
-                      <span className="font-mono text-xs font-bold text-orange-400 mr-2 select-none">
+                      <div className="flex items-center gap-1.5 mb-1.5 md:hidden">
+                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                          isDark
+                            ? 'bg-orange-500/20 text-orange-300'
+                            : 'bg-sky-100 text-sky-800'
+                        }`}>
+                          {currentTranslation}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-xs font-bold mr-2 select-none ${
+                        isDark ? 'text-orange-400' : isSepia ? 'text-amber-900' : 'text-sky-700'
+                      }`}>
                         {pv.verse}.
                       </span>
-                      <span>{pv.text}</span>
+                      <span className="font-normal">{pv.text}</span>
                     </div>
 
-                    <div className="text-slate-300 border-t md:border-t-0 md:border-l border-slate-800 pt-2 md:pt-0 md:pl-4">
-                      <span className="font-mono text-xs font-bold text-amber-400 mr-2 select-none">
+                    <div className={`border-t md:border-t-0 md:border-l pt-2.5 md:pt-0 md:pl-4 ${
+                      isDark
+                        ? 'border-slate-800 text-slate-200'
+                        : isSepia
+                        ? 'border-stone-300 text-stone-800'
+                        : 'border-slate-200 text-slate-800'
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-1.5 md:hidden">
+                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                          isDark
+                            ? 'bg-amber-500/20 text-amber-300'
+                            : 'bg-amber-100 text-amber-900'
+                        }`}>
+                          {readerSettings.parallelTranslation}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-xs font-bold mr-2 select-none ${
+                        isDark ? 'text-amber-400' : isSepia ? 'text-amber-800' : 'text-amber-700'
+                      }`}>
                         {sv.verse}.
                       </span>
-                      <span>{sv.text}</span>
+                      <span className="font-normal">{sv.text}</span>
                     </div>
                   </div>
                 );
@@ -890,28 +1031,55 @@ export const BibleReader: React.FC<BibleReaderProps> = ({
         )}
 
         {/* Bottom Chapter Navigation Bar */}
-        <div className="mt-12 pt-8 border-t border-slate-800 flex items-center justify-between">
+        <div className={`mt-8 sm:mt-12 pt-6 sm:pt-8 border-t flex items-center justify-between gap-2 ${
+          isDark ? 'border-slate-800' : isSepia ? 'border-stone-300' : 'border-slate-200'
+        }`}>
           <button
             onClick={handlePrevChapter}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-colors"
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 text-xs font-bold rounded-xl border transition-colors shrink-0 cursor-pointer ${
+              isDark
+                ? 'bg-slate-800 hover:bg-slate-700 text-slate-100 border-slate-700'
+                : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300 shadow-xs'
+            }`}
           >
             <ChevronLeft className="h-4 w-4" />
-            <span>Chapitre Précédent</span>
+            <span className="sm:hidden">Précédent</span>
+            <span className="hidden sm:inline">Chapitre Précédent</span>
           </button>
 
-          <span className="font-cinzel text-xs text-slate-400">
+          <span className={`font-cinzel text-xs font-bold text-center truncate px-1 ${
+            isDark ? 'text-slate-300' : isSepia ? 'text-stone-800' : 'text-slate-800'
+          }`}>
             {currentBook.name} {currentChapter} / {currentBook.chaptersCount}
           </span>
 
           <button
             onClick={handleNextChapter}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-semibold rounded-xl shadow-md transition-all"
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 text-xs font-bold rounded-xl border transition-colors shrink-0 cursor-pointer ${
+              isDark
+                ? 'bg-slate-800 hover:bg-slate-700 text-slate-100 border-slate-700'
+                : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300 shadow-xs'
+            }`}
           >
-            <span>Chapitre Suivant</span>
+            <span className="sm:hidden">Suivant</span>
+            <span className="hidden sm:inline">Chapitre Suivant</span>
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </main>
+
+      {/* Floating Interactive Chapter Audio-Guide Player */}
+      <ChapterAudioGuidePlayer
+        guide={getChapterTheologicalGuide(
+          currentBook.id,
+          currentBook.name,
+          currentChapter,
+          currentBook.category,
+          currentBook.testament
+        )}
+        isOpen={isAudioGuideOpen}
+        onClose={() => setIsAudioGuideOpen(false)}
+      />
     </div>
   );
 };

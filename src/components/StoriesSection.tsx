@@ -90,15 +90,15 @@ export const StoriesSection: React.FC<StoriesSectionProps> = ({ onAwardPoints })
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 py-8 px-4 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white text-slate-800 py-4 sm:py-8 px-2.5 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="pb-6 border-b border-sky-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs uppercase tracking-widest text-sky-600 font-semibold font-cinzel">
               Enseignements & Récits Bibliques
             </span>
-            <h1 className="font-cinzel text-3xl font-bold text-slate-900 mt-1">
+            <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
               Histoires Fondatrices & Quiz d'Apprentissage
             </h1>
             <p className="text-xs text-slate-500 mt-1">

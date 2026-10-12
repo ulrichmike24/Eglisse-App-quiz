@@ -420,71 +420,73 @@ Tous les textes bibliques cités proviennent de notre base canonique vérifiée 
       )}
 
       {/* Top Banner / Chat Header */}
-      <div className="sticky top-16 z-30 border-b border-sky-100 bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3.5 shadow-xs">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="sticky top-14 sm:top-16 z-30 border-b border-sky-100 bg-white/95 backdrop-blur-md px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 shadow-xs">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3">
           {/* Left: Branding & Agent Manager identity */}
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
-              <Bot className="h-5 w-5" />
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 shrink-0">
+              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                  BIBLE AI — Assistant Biblique Intelligent
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-lg font-bold text-slate-900 truncate">
+                  BIBLE AI — Assistant Biblique
                 </h2>
                 <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-extrabold uppercase tracking-wide">
                   <ShieldCheck className="h-3 w-3 text-sky-600" />
                   RAG Vérifié
                 </span>
               </div>
-              <p className="text-xs text-slate-500 hidden sm:block">
+              <p className="text-[11px] sm:text-xs text-slate-500 truncate hidden sm:block">
                 Architecture multi-agents : Exégèse, Dictionnaire Strong, Biographies & Études théologiques.
               </p>
             </div>
           </div>
 
           {/* Right: Controls & Options */}
-          <div className="flex items-center gap-2 flex-wrap justify-end">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-between md:justify-end w-full md:w-auto">
             {/* Translation Picker */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700">
-              <Languages className="h-3.5 w-3.5 text-sky-500" />
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 max-w-[130px] sm:max-w-none">
+              <Languages className="h-3.5 w-3.5 text-sky-500 shrink-0" />
               <select
                 value={selectedTranslation}
                 onChange={(e) => setSelectedTranslation(e.target.value as TranslationKey)}
-                className="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer truncate max-w-[95px] sm:max-w-none"
                 title="Version biblique de référence"
               >
-                <option value="LSG">Louis Segond 1910 (LSG)</option>
-                <option value="BDS">Bible du Semeur (BDS)</option>
-                <option value="BFC">Français Courant (BFC)</option>
-                <option value="DARBY">Darby (Littérale)</option>
-                <option value="KJV">King James (KJV)</option>
-                <option value="AMP">Amplifiée (AMP)</option>
+                <option value="LSG">LSG 1910</option>
+                <option value="BDS">BDS</option>
+                <option value="BFC">BFC</option>
+                <option value="DARBY">Darby</option>
+                <option value="KJV">KJV</option>
+                <option value="AMP">Amplifiée</option>
               </select>
             </div>
 
-            {/* Export Chat */}
-            <button
-              onClick={handleExportChat}
-              className="p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
-              title="Exporter l'historique en Markdown"
-            >
-              <Download className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              {/* Export Chat */}
+              <button
+                onClick={handleExportChat}
+                className="p-1.5 sm:p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                title="Exporter l'historique en Markdown"
+              >
+                <Download className="h-4 w-4" />
+              </button>
 
-            {/* Clear Chat */}
-            <button
-              onClick={handleClearChat}
-              className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
-              title="Réinitialiser la conversation"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+              {/* Clear Chat */}
+              <button
+                onClick={handleClearChat}
+                className="p-1.5 sm:p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                title="Réinitialiser la conversation"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Specialized Agent Filters Strip */}
-        <div className="max-w-6xl mx-auto mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div className="max-w-6xl mx-auto mt-2.5 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
           <span className="text-[11px] font-semibold text-slate-500 whitespace-nowrap">Mode Agent :</span>
           {AGENT_FILTERS.map((ag) => {
             const Icon = ag.icon;
@@ -768,7 +770,7 @@ Tous les textes bibliques cités proviennent de notre base canonique vérifiée 
       </div>
 
       {/* Input Box Footer */}
-      <div className="sticky bottom-0 z-30 border-t border-sky-100 bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-4 shadow-lg">
+      <div className="sticky bottom-14 md:bottom-0 z-30 border-t border-sky-100 bg-white/95 backdrop-blur-md px-2.5 sm:px-6 lg:px-8 py-2 sm:py-4 shadow-lg">
         <div className="max-w-4xl mx-auto space-y-2">
           {/* Form */}
           <div className="relative rounded-2xl border border-slate-300 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-400/20 bg-slate-50 focus-within:bg-white transition-all shadow-xs flex items-end">
@@ -777,16 +779,16 @@ Tous les textes bibliques cités proviennent de notre base canonique vérifiée 
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Posez votre question (ex: « Explique Jean 3:16 », « Qui était David ? », « Versets sur la foi »)..."
+              placeholder="Posez votre question (ex: « Explique Jean 3:16 », « Qui était David ? »)..."
               rows={2}
-              className="w-full p-3.5 pr-14 text-sm text-slate-800 placeholder-slate-400 bg-transparent resize-none focus:outline-none max-h-36"
+              className="w-full p-2.5 sm:p-3.5 pr-12 sm:pr-14 text-xs sm:text-sm text-slate-800 placeholder-slate-400 bg-transparent resize-none focus:outline-none max-h-36"
             />
 
-            <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1.5">
+            <div className="absolute right-2 bottom-2 sm:right-2.5 sm:bottom-2.5 flex items-center gap-1.5">
               <button
                 onClick={() => sendMessage()}
                 disabled={!inputMessage.trim() || isLoading}
-                className={`p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer ${
+                className={`p-2 sm:p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer ${
                   inputMessage.trim() && !isLoading
                     ? 'bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20'
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed'
@@ -798,13 +800,11 @@ Tous les textes bibliques cités proviennent de notre base canonique vérifiée 
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
-            <span>
-              Appuyez sur <kbd className="bg-slate-100 px-1 py-0.5 rounded border border-slate-200">Entrée</kbd> pour
-              envoyer, <kbd className="bg-slate-100 px-1 py-0.5 rounded border border-slate-200">Maj+Entrée</kbd> pour
-              nouvelle ligne.
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 px-1">
+            <span className="truncate">
+              <span className="hidden sm:inline">Appuyez sur <kbd className="bg-slate-100 px-1 py-0.5 rounded border border-slate-200">Entrée</kbd> pour envoyer • </span>RAG Canonique
             </span>
-            <span className="hidden sm:inline">RAG Canonique • Textes 100% fidèles aux Écritures</span>
+            <span className="hidden sm:inline">Textes 100% fidèles aux Écritures</span>
           </div>
         </div>
       </div>

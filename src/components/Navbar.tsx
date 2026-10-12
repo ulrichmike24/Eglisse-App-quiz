@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   Compass,
   Bot,
+  Flame,
 } from 'lucide-react';
 import { UserProfile } from '../types';
 
@@ -143,11 +144,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'groups',
       tab: 'groups',
-      title: 'Familles de Disciples (CRUD)',
-      subtitle: 'Gestion des cellules de maison, ajout et suivi des disciples, objectifs spirituels hebdomadaires et points de fidélité.',
+      title: 'Défis Quotidiens & Familles de Disciples',
+      subtitle: 'Défis de lecture récompensés en points, gestion des cellules de maison, suivi individuel et objectifs spirituels.',
       icon: Users,
-      badge: 'Gestion CRUD',
-      badgeColor: 'bg-emerald-100 text-emerald-700',
+      badge: 'Défis & Points',
+      badgeColor: 'bg-amber-100 text-amber-800',
       category: 'community',
     },
     {
@@ -256,19 +257,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sky-100 bg-white/95 backdrop-blur-md transition-colors shadow-xs">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-2.5 sm:px-6 lg:px-8">
         {/* Left Side: Brand Logo + CURRENT TAB BADGE + DEDICATED NAVIGATION MENU BUTTON */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4 min-w-0">
           <button
             onClick={() => setActiveTab('landing')}
-            className="group flex items-center gap-2.5 text-left focus-visible:outline-none cursor-pointer"
+            className="group flex items-center gap-1.5 sm:gap-2.5 text-left focus-visible:outline-none cursor-pointer shrink-0"
             title="Retour à l'accueil"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="h-5 w-5 text-white" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform shrink-0">
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="font-cinzel text-xl font-bold tracking-wider text-slate-900 group-hover:text-sky-600 transition-colors">
+              <span className="font-cinzel text-base sm:text-xl font-bold tracking-wider text-slate-900 group-hover:text-sky-600 transition-colors">
                 BÉRÉENS
               </span>
               <span className="text-[9px] uppercase tracking-widest text-sky-600 font-semibold -mt-1 hidden sm:block">
@@ -278,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Current Page Pill (shows user where they are) */}
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200/80 text-xs font-medium text-slate-600">
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200/80 text-xs font-medium text-slate-600">
             <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
             <span className="truncate max-w-[140px] font-semibold text-slate-700">
               {getActiveTabLabel(activeTab)}
@@ -286,11 +287,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* MAIN NAVIGATION MENU BUTTON (CLICK TO DISPLAY ALL FEATURES) */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               ref={triggerRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold text-xs sm:text-sm border transition-all cursor-pointer shadow-xs ${
+              className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-semibold text-xs sm:text-sm border transition-all cursor-pointer shadow-xs ${
                 isMenuOpen
                   ? 'bg-sky-500 text-white border-sky-500 shadow-md shadow-sky-500/30 ring-2 ring-sky-300'
                   : 'bg-sky-50 hover:bg-sky-100 text-sky-700 border-sky-200 hover:border-sky-300'
@@ -298,13 +299,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               aria-expanded={isMenuOpen}
               aria-label="Menu de navigation - Afficher les fonctionnalités"
             >
-              <Menu className={`h-4 w-4 ${isMenuOpen ? 'text-white' : 'text-sky-600'}`} />
-              <span className="font-bold tracking-wide">Menu de Navigation</span>
-              <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-md bg-white/30 text-[10px] font-mono">
+              <Menu className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isMenuOpen ? 'text-white' : 'text-sky-600'}`} />
+              <span className="font-bold tracking-wide">Menu</span>
+              <span className="hidden sm:inline font-bold tracking-wide">de Navigation</span>
+              <span className="hidden md:inline-block px-1.5 py-0.2 rounded-md bg-white/30 text-[10px] font-mono">
                 {allFeatures.length}
               </span>
               <ChevronDown
-                className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 ${
                   isMenuOpen ? 'rotate-180 text-white' : 'text-sky-600'
                 }`}
               />
@@ -369,14 +371,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Side: Quick Tools & Auth Profile */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2">
           {/* AI Search Button */}
           <button
             onClick={onOpenSearch}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-sky-50 hover:text-sky-700 rounded-xl border border-slate-200 hover:border-sky-200 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-sky-50 hover:text-sky-700 rounded-xl border border-slate-200 hover:border-sky-200 transition-colors cursor-pointer shrink-0"
             title="Recherche biblique sémantique par IA (⌘K)"
           >
-            <Search className="h-3.5 w-3.5 text-sky-500" />
+            <Search className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-sky-500" />
             <span className="hidden sm:inline">Recherche IA</span>
             <kbd className="hidden md:inline text-[10px] bg-white px-1.5 py-0.5 rounded text-slate-500 border border-slate-200 font-mono">
               ⌘K
@@ -387,7 +389,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onQuickSync}
             disabled={isSyncing}
-            className="p-2 text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-colors relative cursor-pointer border border-transparent hover:border-sky-100"
+            className="p-1.5 sm:p-2 text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-colors relative cursor-pointer border border-transparent hover:border-sky-100 shrink-0"
             title="Synchronisation Cloud en temps réel"
           >
             <RefreshCw className={`h-4 w-4 text-sky-500 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -397,7 +399,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isGuest ? (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-md hover:shadow-sky-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-md hover:shadow-sky-500/20 transition-all cursor-pointer shrink-0"
             >
               <LogIn className="h-3.5 w-3.5 text-sky-100" />
               <span>Connexion</span>
@@ -405,9 +407,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-2 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-slate-800 rounded-xl text-xs font-medium border border-sky-200 shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-slate-800 rounded-xl text-xs font-medium border border-sky-200 shadow-xs transition-all cursor-pointer shrink-0"
             >
-              <div className="w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
+              <div className="w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center text-[10px] font-bold text-white shadow-xs shrink-0">
                 {userProfile.firstName.charAt(0)}
               </div>
               <span className="hidden sm:inline truncate max-w-[100px] font-semibold text-slate-800">
@@ -420,6 +422,64 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
       </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* MOBILE BOTTOM NAVIGATION BAR (FIXED FOR QUICK 1-TAP THUMB ACCESS) */}
+      {/* ------------------------------------------------------------- */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-sky-200/80 shadow-2xl px-1 py-1.5 flex items-center justify-around">
+        <button
+          onClick={() => setActiveTab('landing')}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'landing' ? 'text-sky-700 font-extrabold bg-sky-50' : 'text-slate-700 font-semibold hover:text-slate-900'
+          }`}
+        >
+          <Home className="h-5 w-5" />
+          <span className="text-[11px] mt-0.5">Accueil</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('bible')}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'bible' ? 'text-sky-700 font-extrabold bg-sky-50' : 'text-slate-700 font-semibold hover:text-slate-900'
+          }`}
+        >
+          <BookOpen className="h-5 w-5" />
+          <span className="text-[11px] mt-0.5">Bible</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('chat')}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all relative ${
+            activeTab === 'chat' ? 'text-sky-700 font-extrabold bg-sky-50' : 'text-slate-700 font-semibold hover:text-slate-900'
+          }`}
+        >
+          <div className="relative">
+            <Bot className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1.5 h-2 w-2 rounded-full bg-sky-500 animate-ping" />
+          </div>
+          <span className="text-[11px] mt-0.5">Bible AI</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('groups')}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'groups' ? 'text-sky-700 font-extrabold bg-sky-50' : 'text-slate-700 font-semibold hover:text-slate-900'
+          }`}
+        >
+          <Flame className="h-5 w-5 text-amber-500" />
+          <span className="text-[11px] mt-0.5">Défis & Pts</span>
+        </button>
+
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+            isMenuOpen ? 'text-sky-700 font-extrabold bg-sky-50' : 'text-slate-700 font-semibold hover:text-slate-900'
+          }`}
+        >
+          <Menu className="h-5 w-5" />
+          <span className="text-[11px] mt-0.5">Menu</span>
+        </button>
+      </nav>
 
       {/* ------------------------------------------------------------- */}
       {/* THE NAVIGATION MENU: INTERACTIVE FULL FEATURES MODAL / DRAWER   */}

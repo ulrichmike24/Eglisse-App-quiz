@@ -235,10 +235,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans selection:bg-sky-500 selection:text-white w-full max-w-full overflow-x-hidden">
       {/* Toast Notification */}
       {syncToast && (
-        <div className="fixed bottom-5 right-5 z-50 p-4 rounded-2xl bg-white border border-sky-200 text-slate-800 text-xs font-semibold shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-20 md:bottom-5 left-4 right-4 sm:left-auto sm:right-5 z-50 p-4 rounded-2xl bg-white border border-sky-200 text-slate-800 text-xs font-semibold shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-3 duration-200">
           <div className="h-2 w-2 rounded-full bg-sky-500 animate-ping" />
           <span>{syncToast}</span>
         </div>
@@ -258,7 +258,7 @@ export default function App() {
       />
 
       {/* Main Section Routing */}
-      <div className="flex-1">
+      <div className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
         {activeTab === 'landing' && (
           <LandingPage
             onNavigateTab={(tab) => setActiveTab(tab)}
@@ -335,6 +335,11 @@ export default function App() {
             onUpdateMember={handleUpdateMember}
             onDeleteMember={handleDeleteMember}
             onUpdateUserPoints={(pts) => handleAwardPoints(pts - userProfile.points)}
+            onNavigateToPassage={(bId, cNum) => {
+              setCurrentBookId(bId);
+              setCurrentChapter(cNum);
+              setActiveTab('bible');
+            }}
           />
         )}
 

@@ -121,21 +121,21 @@ export const VerseModal: React.FC<VerseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
-          <div className="flex items-center gap-3">
-            <span className="font-cinzel text-lg font-bold text-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-200 px-3 sm:px-6 py-3 sm:py-4 bg-slate-50 gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
+            <span className="font-cinzel text-sm sm:text-lg font-bold text-slate-900 truncate">
               {verse.bookName} {verse.chapter}:{verse.verse}
             </span>
-            <span className="text-xs text-sky-600 font-mono font-bold">({verse.translation})</span>
+            <span className="text-[10px] sm:text-xs text-sky-600 font-mono font-bold shrink-0">({verse.translation})</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={handleToggleAudio}
-              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+              className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
                 isPlayingAudio ? 'bg-sky-500 text-white' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-100'
               }`}
               title="Écouter le verset"
@@ -145,7 +145,7 @@ export const VerseModal: React.FC<VerseModalProps> = ({
 
             <button
               onClick={onToggleBookmark}
-              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+              className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
                 isBookmarked ? 'bg-amber-100 text-amber-600' : 'text-slate-500 hover:text-amber-500 hover:bg-slate-100'
               }`}
               title="Ajouter aux favoris"
@@ -155,7 +155,7 @@ export const VerseModal: React.FC<VerseModalProps> = ({
 
             <button
               onClick={onOpenShareModal}
-              className="p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               title="Partager en image stylée"
             >
               <Share2 className="h-4 w-4" />
@@ -163,7 +163,7 @@ export const VerseModal: React.FC<VerseModalProps> = ({
 
             <button
               onClick={handleCopyText}
-              className="p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               title="Copier le texte"
             >
               {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
@@ -171,7 +171,7 @@ export const VerseModal: React.FC<VerseModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
@@ -179,9 +179,9 @@ export const VerseModal: React.FC<VerseModalProps> = ({
         </div>
 
         {/* Verse Highlight Bar */}
-        <div className="flex items-center justify-between px-6 py-2.5 bg-slate-50/70 border-b border-slate-200 text-xs text-slate-500">
-          <span>Couleur de surlignage :</span>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-2.5 bg-slate-50/70 border-b border-slate-200 text-xs text-slate-500">
+          <span className="text-[11px] sm:text-xs">Couleur de surlignage :</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {colors.map((c) => (
               <button
                 key={c.id}
@@ -196,53 +196,53 @@ export const VerseModal: React.FC<VerseModalProps> = ({
         </div>
 
         {/* Selected Verse Quote Display */}
-        <div className="px-6 py-4 bg-sky-50/50 border-b border-slate-200">
-          <blockquote className="font-cormorant text-xl text-slate-800 leading-relaxed italic border-l-2 border-sky-500 pl-4">
+        <div className="px-3.5 sm:px-6 py-3 sm:py-4 bg-sky-50/50 border-b border-slate-200">
+          <blockquote className="font-cormorant text-base sm:text-xl text-slate-800 leading-relaxed italic border-l-2 border-sky-500 pl-3 sm:pl-4">
             « {verse.text} »
           </blockquote>
         </div>
 
         {/* Modal Tabs */}
-        <div className="flex border-b border-slate-200 bg-white px-6 text-sm font-medium">
+        <div className="flex border-b border-slate-200 bg-white px-2 sm:px-6 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('note')}
-            className={`py-3 px-4 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === 'note'
                 ? 'border-sky-500 text-sky-600 font-semibold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Save className="h-4 w-4" />
-            <span>Ma Réflexion & Note</span>
+            <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>Note</span>
           </button>
 
           <button
             onClick={() => setActiveTab('translations')}
-            className={`py-3 px-4 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === 'translations'
                 ? 'border-sky-500 text-sky-600 font-semibold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Languages className="h-4 w-4" />
-            <span>Comparaison Traductions</span>
+            <Languages className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>Traductions</span>
           </button>
 
           <button
             onClick={() => setActiveTab('ai')}
-            className={`py-3 px-4 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === 'ai'
                 ? 'border-sky-500 text-sky-600 font-semibold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Sparkles className="h-4 w-4 text-sky-500" />
-            <span>Éclairage IA & Prière</span>
+            <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-sky-500" />
+            <span>Éclairage IA</span>
           </button>
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-4 text-slate-700">
+        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-4 text-slate-700">
           {activeTab === 'note' && (
             <div className="space-y-4">
               <div>

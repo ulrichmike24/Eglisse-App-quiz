@@ -33,34 +33,34 @@ export const ReadingPlanModal: React.FC<ReadingPlanModalProps> = ({
   const progressPercent = Math.round((completedCount / totalReadings) * 100);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Calendar className="h-5 w-5 text-sky-500" />
-            <div>
-              <h3 className="font-cinzel text-base font-bold text-slate-900">
-                Plan de Lecture : La Bible en 1 An (EMCI TV)
+        <div className="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <h3 className="font-cinzel text-xs sm:text-base font-bold text-slate-900 truncate">
+                Plan de Lecture : La Bible en 1 An
               </h3>
-              <p className="text-[11px] text-slate-500">
-                Une portion quotidienne équilibrée : Ancien Testament, Nouveau Testament & Psaumes
+              <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+                Portion quotidienne : Ancien Testament, Nouveau Testament & Psaumes
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg cursor-pointer shrink-0"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Global Progress Bar */}
-        <div className="px-6 py-4 bg-white border-b border-slate-200 space-y-2">
+        <div className="px-3.5 sm:px-6 py-3 sm:py-4 bg-white border-b border-slate-200 space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-700 font-semibold">Progression globale du plan annuel :</span>
-            <span className="font-mono text-sky-600 font-bold">{progressPercent}% accompli</span>
+            <span className="text-slate-700 font-semibold truncate">Progression globale :</span>
+            <span className="font-mono text-sky-600 font-bold shrink-0">{progressPercent}% accompli</span>
           </div>
           <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200">
             <div
@@ -71,7 +71,7 @@ export const ReadingPlanModal: React.FC<ReadingPlanModalProps> = ({
         </div>
 
         {/* Days List */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-4">
+        <div className="p-3 sm:p-6 overflow-y-auto flex-1 space-y-3 sm:space-y-4">
           {readingPlan.map((day) => (
             <div
               key={day.day}

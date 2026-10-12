@@ -429,29 +429,29 @@ export const KidsZone: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans py-8 px-4 sm:px-6 lg:px-8 selection:bg-sky-500 selection:text-white">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white text-slate-800 font-sans py-4 sm:py-8 px-2.5 sm:px-6 lg:px-8 selection:bg-sky-500 selection:text-white">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         {/* ------------------------------------------------------------- */}
         {/* CHILD HEADER RIBBON */}
         {/* ------------------------------------------------------------- */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-sky-500 via-sky-600 to-cyan-600 shadow-xl shadow-sky-500/15 text-white flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3.5 rounded-2xl bg-white/20 backdrop-blur-md text-white shadow-xs">
-              <Baby className="h-8 w-8 text-white" />
+        <div className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-sky-500 via-sky-600 to-cyan-600 shadow-xl shadow-sky-500/15 text-white flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-white/20 backdrop-blur-md text-white shadow-xs shrink-0">
+              <Baby className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-xs uppercase tracking-widest text-sky-100 font-bold">
+                <span className="text-[10px] sm:text-xs uppercase tracking-widest text-sky-100 font-bold truncate">
                   Espace Enfants • La Bible en Histoires
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-white/25 text-[10px] font-bold">
+                <span className="px-2 py-0.2 rounded-full bg-white/25 text-[10px] font-bold shrink-0">
                   {stories.length} Récits
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-white mt-0.5 truncate">
                 Le Jardin des Petits Disciples
               </h1>
-              <p className="text-xs sm:text-sm text-sky-100 mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-sky-100 mt-1 max-w-xl hidden sm:block">
                 Histoires bibliques animées, voix audio, quiz interactifs et générateur d'histoires par IA Gemini !
               </p>
             </div>
@@ -517,31 +517,31 @@ export const KidsZone: React.FC = () => {
             </div>
 
             {/* Search & Filters */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial min-w-[140px]">
                 <Search className="h-4 w-4 text-sky-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Rechercher une histoire..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400 w-44 sm:w-52"
+                  className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400 w-full sm:w-52"
                 />
               </div>
 
               {/* Age filter buttons */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium overflow-x-auto max-w-full">
                 {['ALL', '3-5', '6-8', '9-12'].map((age) => (
                   <button
                     key={age}
                     onClick={() => setAgeFilter(age)}
-                    className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 sm:px-2.5 py-1 rounded-lg transition-colors cursor-pointer shrink-0 text-[11px] sm:text-xs ${
                       ageFilter === age
                         ? 'bg-sky-500 text-white font-semibold shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    {age === 'ALL' ? 'Tous âges' : `${age} ans`}
+                    {age === 'ALL' ? 'Tous' : `${age} ans`}
                   </button>
                 ))}
               </div>

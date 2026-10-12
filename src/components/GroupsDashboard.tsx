@@ -22,10 +22,13 @@ import {
   Printer,
   X,
   UserCheck,
+  BookOpen,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DiscipleshipGroup, GroupMemberProgress, UserProfile } from '../types';
 import { AISpiritualGrowthResult, AIService } from '../services/aiService';
+import { DailyBibleChallengesSection } from './DailyBibleChallengesSection';
+import { StorageService } from '../services/storage';
 
 interface GroupsDashboardProps {
   groups: DiscipleshipGroup[];
@@ -42,6 +45,7 @@ interface GroupsDashboardProps {
   onUpdateMember: (userId: string, updatedFields: Partial<GroupMemberProgress>) => void;
   onDeleteMember: (userId: string) => void;
   onUpdateUserPoints: (newPoints: number) => void;
+  onNavigateToPassage?: (bookId: string, chapter: number) => void;
 }
 
 export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
@@ -56,8 +60,16 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
   onUpdateMember,
   onDeleteMember,
   onUpdateUserPoints,
+  onNavigateToPassage,
 }) => {
   const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
+  const [activeSubTab, setActiveSubTab] = useState<'challenges' | 'groups'>('challenges');
+  const [completedChallengeIds, setCompletedChallengeIds] = useState<string[]>(() => {
+    return StorageService.getChallengeCompletions()
+      .filter((c) => c.userId === userProfile.id)
+      .map((c) => c.challengeId);
+  });
+  const [challengeSuccessToast, setChallengeSuccessToast] = useState<string | null>(null);
 
   // Modals state
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
@@ -279,84 +291,183 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
     window.print();
   };
 
+  const handleAwardChallengePoints = (
+    userPointsAward: number,
+    bonusGroupPoints: number,
+    challengeTitle: string
+  ) => {
+    const updatedIds = [...completedChallengeIds, challengeTitle];
+    setCompletedChallengeIds(updatedIds);
+
+    // Save completion record
+    StorageService.recordChallengeCompletion({
+      challengeId: challengeTitle,
+      userId: userProfile.id,
+      completedAt: new Date().toISOString(),
+      pointsEarned: userPointsAward,
+      bonusGroupPointsEarned: bonusGroupPoints,
+    });
+
+    // Update user profile points
+    onUpdateUserPoints(userProfile.points + userPointsAward);
+
+    // If current user is in members list, update their points & daily completion percentage
+    const existingMember = membersProgress.find((m) => m.userId === userProfile.id);
+    if (existingMember) {
+      onUpdateMember(userProfile.id, {
+        points: existingMember.points + userPointsAward + bonusGroupPoints,
+        dailyCompletedPercent: Math.min(100, existingMember.dailyCompletedPercent + 25),
+        weeklyCompletedPercent: Math.min(100, existingMember.weeklyCompletedPercent + 15),
+        chaptersReadThisWeek: existingMember.chaptersReadThisWeek + 1,
+        lastActive: 'Défi complété à l’instant',
+      });
+    }
+
+    setChallengeSuccessToast(
+      `Félicitations ! Vous avez remporté +${userPointsAward} pts et offert +${bonusGroupPoints} pts bonus à votre groupe de disciples.`
+    );
+    setTimeout(() => {
+      setChallengeSuccessToast(null);
+    }, 5000);
+  };
+
   return (
-    <div className="min-h-screen bg-white text-slate-800 py-8 px-4 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-sky-100">
-          <div>
-            <span className="text-xs uppercase tracking-widest text-sky-600 font-semibold font-cinzel">
-              Gestion Multi-Groupes & Suivi des Disciples (CRUD)
+    <div className="min-h-screen bg-white text-slate-800 py-4 sm:py-8 px-2.5 sm:px-6 lg:px-8 font-sans selection:bg-sky-500 selection:text-white">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {challengeSuccessToast && (
+          <div className="p-4 rounded-2xl bg-emerald-500 text-white font-semibold text-xs shadow-lg flex items-center justify-between animate-in fade-in slide-in-from-top duration-300">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-100" />
+              <span>{challengeSuccessToast}</span>
+            </div>
+            <button
+              onClick={() => setChallengeSuccessToast(null)}
+              className="p-1 hover:bg-emerald-600 rounded-lg text-emerald-100 cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Sub-Tabs: Défis Quotidiens vs Gestion des Familles */}
+        <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 bg-slate-100 rounded-2xl max-w-md w-full border border-slate-200">
+          <button
+            onClick={() => setActiveSubTab('challenges')}
+            className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeSubTab === 'challenges'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Flame className="h-4 w-4 text-amber-300" />
+            <span>Défis Quotidiens</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-900 text-[10px] font-black">
+              +Pts
             </span>
-            <h1 className="font-cinzel text-3xl font-bold text-slate-900 mt-1">
-              Familles de Disciples
-            </h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Objectifs journaliers, hebdomadaires et mensuels avec barres de progression individuelles.
-            </p>
-          </div>
+          </button>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={handleTriggerAIEvaluation}
-              disabled={isEvaluatingAI}
-              className="flex items-center gap-2 px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-semibold shadow-md transition-all disabled:opacity-50 cursor-pointer"
-            >
-              <Sparkles className="h-4 w-4 text-sky-100" />
-              <span>{isEvaluatingAI ? 'Calcul IA en cours...' : 'Calculer mes points IA'}</span>
-            </button>
-
-            <button
-              onClick={openCreateGroupModal}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl border border-sky-200 transition-colors shadow-xs cursor-pointer"
-            >
-              <Plus className="h-4 w-4 text-sky-500" />
-              <span>Nouvelle Famille</span>
-            </button>
-
-            <button
-              onClick={handlePrintGroupReport}
-              className="p-2.5 text-slate-600 hover:text-sky-600 bg-slate-50 hover:bg-sky-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
-              title="Imprimer / Exporter le rapport du groupe"
-            >
-              <Printer className="h-4 w-4 text-sky-500" />
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveSubTab('groups')}
+            className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeSubTab === 'groups'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Users className="h-4 w-4" />
+            <span>Familles</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 text-[10px]">
+              {groups.length}
+            </span>
+          </button>
         </div>
-
-        {/* AI Spiritual Evaluation Card (if active) */}
-        {aiEvaluation && (
-          <div className="p-6 rounded-2xl bg-sky-50/70 border border-sky-200 shadow-sm space-y-4 animate-in fade-in">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 border border-sky-200">
-                  <Award className="h-6 w-6 text-sky-500" />
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-sky-600 tracking-wider">
-                    Évaluation IA de Croissance Spirituelle
-                  </span>
-                  <h3 className="font-cinzel text-lg font-bold text-slate-900">
-                    Palier Spirituel : {aiEvaluation.growthTier}
-                  </h3>
-                </div>
+        {/* CONDITIONAL SUB-TAB VIEW: DAILY CHALLENGES VS GROUPS */}
+        {activeSubTab === 'challenges' ? (
+          <DailyBibleChallengesSection
+            userProfile={userProfile}
+            selectedGroup={selectedGroup}
+            membersProgress={membersProgress}
+            onAwardChallengePoints={handleAwardChallengePoints}
+            onNavigateToPassage={onNavigateToPassage}
+            completedChallengeIds={completedChallengeIds}
+          />
+        ) : (
+          <>
+            {/* Header Banner */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-sky-100">
+              <div className="min-w-0">
+                <span className="text-[11px] sm:text-xs uppercase tracking-widest text-sky-600 font-semibold font-cinzel">
+                  Gestion Multi-Groupes & Suivi des Disciples (CRUD)
+                </span>
+                <h1 className="font-cinzel text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mt-1 break-words">
+                  Familles de Disciples
+                </h1>
+                <p className="text-xs text-slate-500 mt-1">
+                  Objectifs journaliers, hebdomadaires et mensuels avec barres de progression individuelles.
+                </p>
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-2xl font-bold font-mono text-sky-600">
-                    +{aiEvaluation.totalPoints} pts
-                  </div>
-                  <div className="text-[10px] text-slate-500">Points calculés par l’IA</div>
-                </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <button
+                  onClick={handleTriggerAIEvaluation}
+                  disabled={isEvaluatingAI}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-semibold shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Sparkles className="h-4 w-4 text-sky-100 shrink-0" />
+                  <span className="truncate">{isEvaluatingAI ? 'Calcul IA...' : 'Calculer points IA'}</span>
+                </button>
+
+                <button
+                  onClick={openCreateGroupModal}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl border border-sky-200 transition-colors shadow-xs cursor-pointer"
+                >
+                  <Plus className="h-4 w-4 text-sky-500 shrink-0" />
+                  <span className="truncate">Nouvelle Famille</span>
+                </button>
+
+                <button
+                  onClick={handlePrintGroupReport}
+                  className="p-2.5 text-slate-600 hover:text-sky-600 bg-slate-50 hover:bg-sky-50 rounded-xl border border-slate-200 transition-colors cursor-pointer shrink-0"
+                  title="Imprimer / Exporter le rapport du groupe"
+                >
+                  <Printer className="h-4 w-4 text-sky-500" />
+                </button>
               </div>
             </div>
 
-            <p className="text-xs text-slate-700 italic bg-white p-3.5 rounded-xl border border-sky-100 shadow-xs">
-              « {aiEvaluation.evaluation} »
-            </p>
-          </div>
-        )}
+            {/* AI Spiritual Evaluation Card (if active) */}
+            {aiEvaluation && (
+              <div className="p-6 rounded-2xl bg-sky-50/70 border border-sky-200 shadow-sm space-y-4 animate-in fade-in">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 border border-sky-200">
+                      <Award className="h-6 w-6 text-sky-500" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-sky-600 tracking-wider">
+                        Évaluation IA de Croissance Spirituelle
+                      </span>
+                      <h3 className="font-cinzel text-lg font-bold text-slate-900">
+                        Palier Spirituel : {aiEvaluation.growthTier}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-2xl font-bold font-mono text-sky-600">
+                        +{aiEvaluation.totalPoints} pts
+                      </div>
+                      <div className="text-[10px] text-slate-500">Points calculés par l’IA</div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-700 italic bg-white p-3.5 rounded-xl border border-sky-100 shadow-xs">
+                  « {aiEvaluation.evaluation} »
+                </p>
+              </div>
+            )}
 
         {/* ======================================================== */}
         {/* SECTION 1: FAMILIES (GROUPS) CARDS & SELECTOR            */}
@@ -632,20 +743,20 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
                             {member.fullName.charAt(0)}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-sm text-slate-900">{member.fullName}</h4>
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-extrabold text-sm sm:text-base text-slate-900">{member.fullName}</h4>
+                              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-300">
                                 {member.roleInChurch}
                               </span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 mt-0.5">
+                            <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-600 mt-1 font-medium">
                               {member.phone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="h-3 w-3 text-sky-500" />
+                                <span className="flex items-center gap-1 text-slate-700 font-semibold">
+                                  <Phone className="h-3.5 w-3.5 text-sky-600" />
                                   <span>{member.phone}</span>
                                 </span>
                               )}
-                              <span>• {member.points} pts spirituels</span>
+                              <span>• <strong className="text-sky-800 font-bold">{member.points} pts</strong></span>
                               <span>• {member.lastActive}</span>
                             </div>
                           </div>
@@ -655,14 +766,14 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
                         <div className="flex items-center gap-2 self-end sm:self-auto">
                           <button
                             onClick={() => openEditMemberModal(member)}
-                            className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer border border-slate-200"
                             title="Modifier ce membre"
                           >
                             <Edit3 className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteMemberClick(member.userId, member.fullName)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer border border-slate-200"
                             title="Supprimer ce membre"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -671,15 +782,15 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
                       </div>
 
                       {/* 3 Individual Progress Bars */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-100">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-3 border-t border-slate-100">
                         {/* Daily Progress */}
                         <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-slate-600 flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-sky-400" />
+                          <div className="flex items-center justify-between text-xs font-semibold">
+                            <span className="text-slate-800 flex items-center gap-1.5">
+                              <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />
                               <span>Progression Journalière</span>
                             </span>
-                            <span className="font-bold font-mono text-sky-600">
+                            <span className="font-extrabold font-mono text-sky-700">
                               {member.dailyCompletedPercent}%
                             </span>
                           </div>
@@ -693,12 +804,12 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
 
                         {/* Weekly Progress */}
                         <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-slate-600 flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-cyan-400" />
+                          <div className="flex items-center justify-between text-xs font-semibold">
+                            <span className="text-slate-800 flex items-center gap-1.5">
+                              <span className="h-2.5 w-2.5 rounded-full bg-cyan-500" />
                               <span>Progression Hebdomadaire</span>
                             </span>
-                            <span className="font-bold font-mono text-cyan-600">
+                            <span className="font-extrabold font-mono text-cyan-700">
                               {member.weeklyCompletedPercent}%
                             </span>
                           </div>
@@ -712,12 +823,12 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
 
                         {/* Monthly Progress */}
                         <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-slate-600 flex items-center gap-1">
-                              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                          <div className="flex items-center justify-between text-xs font-semibold">
+                            <span className="text-slate-800 flex items-center gap-1.5">
+                              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
                               <span>Progression Mensuelle</span>
                             </span>
-                            <span className="font-bold font-mono text-emerald-600">
+                            <span className="font-extrabold font-mono text-emerald-700">
                               {member.monthlyCompletedPercent}%
                             </span>
                           </div>
@@ -736,13 +847,15 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
             </div>
           </div>
         )}
+        </>
+      )}
 
         {/* ======================================================== */}
         {/* MODAL: CREATE / EDIT FAMILLE                             */}
         {/* ======================================================== */}
         {isCreatingGroup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in">
-            <div className="w-full max-w-lg rounded-3xl bg-white border border-sky-200 shadow-2xl p-6 space-y-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/40 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+            <div className="w-full max-w-lg rounded-2xl sm:rounded-3xl bg-white border border-sky-200 shadow-2xl p-4 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-sky-100 pb-3">
                 <h3 className="font-cinzel text-base font-bold text-slate-900">
                   {editingGroup ? 'Modifier la Famille' : 'Créer une Famille de Disciples'}
@@ -877,8 +990,8 @@ export const GroupsDashboard: React.FC<GroupsDashboardProps> = ({
         {/* MODAL: ADD / EDIT MEMBER (All Requested Fields)          */}
         {/* ======================================================== */}
         {isAddingMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in">
-            <div className="w-full max-w-lg rounded-3xl bg-white border border-sky-200 shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/40 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+            <div className="w-full max-w-lg rounded-2xl sm:rounded-3xl bg-white border border-sky-200 shadow-2xl p-4 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-sky-100 pb-3">
                 <h3 className="font-cinzel text-base font-bold text-slate-900">
                   {editingMember ? 'Modifier le Disciple' : 'Inscrire un Nouveau Disciple'}

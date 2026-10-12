@@ -53,27 +53,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------- */}
       {/* HERO SECTION */}
       {/* ------------------------------------------------------------- */}
-      <section className="relative overflow-hidden pt-12 pb-20 px-4 sm:px-6 lg:px-8 border-b border-sky-100 bg-gradient-to-b from-sky-50/50 via-white to-white">
+      <section className="relative overflow-hidden pt-8 sm:pt-12 pb-12 sm:pb-20 px-3 sm:px-6 lg:px-8 border-b border-sky-100 bg-gradient-to-b from-sky-50/50 via-white to-white">
         {/* Soft background light blooms */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-br from-sky-200/30 via-sky-100/20 to-transparent blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-5xl mx-auto text-center space-y-8">
+        <div className="max-w-5xl mx-auto text-center space-y-6 sm:space-y-8">
           {/* Top Badge */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 shadow-xs text-sky-800 text-xs sm:text-sm font-semibold animate-in fade-in slide-in-from-top-2 duration-300">
-            <Sparkles className="h-4 w-4 text-sky-500 animate-pulse" />
-            <span>Plateforme Biblique & Discipulat Chrétien • Inspiré d’EMCI TV</span>
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-sky-50 border border-sky-200 shadow-xs text-sky-800 text-xs sm:text-sm font-semibold animate-in fade-in slide-in-from-top-2 duration-300 max-w-full">
+            <Sparkles className="h-4 w-4 text-sky-500 animate-pulse shrink-0" />
+            <span className="truncate">Plateforme Biblique & Discipulat Chrétien • Inspiré d’EMCI TV</span>
             <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-sky-400" />
             <span className="hidden sm:inline text-sky-600 font-medium">66 Livres & IA Gemini</span>
           </div>
 
           {/* Main Title */}
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+          <div className="space-y-3 sm:space-y-4">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.18]">
               Plongez dans la <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500">Parole de Dieu</span>,
-              <br />
+              <br className="hidden sm:inline" />
               Grandissez en Famille de Disciples.
             </h1>
-            <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+            <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed font-normal px-2">
               Une expérience spirituelle tout-en-un réunissant le texte intégral des Saintes Écritures,
               la Concordance Strong, un <strong className="text-slate-900 font-semibold">Générateur d’Histoires Bibliques pour Enfants propulsé par l’IA Gemini</strong>,
               ainsi que la gestion complète de vos cellules de disciples et de votre bibliothèque.
@@ -81,10 +81,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-2.5 sm:gap-4 pt-2 max-w-3xl mx-auto">
             <button
               onClick={() => onNavigateTab('chat')}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-semibold text-sm sm:text-base shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-semibold text-sm sm:text-base shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Bot className="h-5 w-5 text-white" />
               <span>Consulter Bible AI (RAG)</span>
@@ -93,7 +93,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={() => onNavigateTab('bible')}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-semibold text-sm sm:text-base shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-semibold text-sm sm:text-base shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <BookOpen className="h-5 w-5 text-sky-600" />
               <span>Ouvrir la Bible d’Étude</span>
@@ -102,7 +102,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={() => onNavigateTab('kids')}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-sky-50 text-slate-800 hover:text-sky-700 font-semibold text-sm sm:text-base border border-sky-200 shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-white hover:bg-sky-50 text-slate-800 hover:text-sky-700 font-semibold text-sm sm:text-base border border-sky-200 shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Baby className="h-5 w-5 text-sky-500" />
               <span>Espace Enfants & IA Gemini</span>
@@ -111,7 +111,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={() => onNavigateTab('groups')}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium text-sm border border-slate-200 transition-all cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium text-sm border border-slate-200 transition-all cursor-pointer"
             >
               <Users className="h-4 w-4 text-sky-500" />
               <span>Familles de Disciples</span>
@@ -120,7 +120,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {isGuest ? (
               <button
                 onClick={onOpenAuth}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm border border-slate-200 transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm border border-slate-200 transition-all cursor-pointer"
               >
                 <ShieldCheck className="h-4 w-4 text-sky-500" />
                 <span>Se Connecter / Inscription</span>
@@ -128,7 +128,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-medium text-sm border border-sky-200 transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-3.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-medium text-sm border border-sky-200 transition-all cursor-pointer"
               >
                 <CheckCircle2 className="h-4 w-4 text-sky-600" />
                 <span>Mon Profil ({userProfile.firstName})</span>
@@ -137,7 +137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Quick Metrics Strip */}
-          <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="pt-6 sm:pt-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto">
             <div className="p-4 rounded-2xl bg-white border border-sky-100 shadow-xs flex flex-col items-center">
               <span className="text-2xl sm:text-3xl font-black text-sky-600">66</span>
               <span className="text-xs text-slate-500 font-medium mt-1">Livres de la Bible (AT & NT)</span>
